@@ -1,13 +1,15 @@
 module.exports = (inTag) => {
-    let tag = document.getElementsByTagName(inTag)
-        ,elements = document.getElementsByTagName(inTag)
-        ,count = 0, i = 0, elementsLength = elements.length ,results = []
+    let tags = document.getElementsByTagName(inTag),
+        counter = 0,
+        i = 0,
+        tagsLength = tags.length,
+        results = []
 
-    for (; i < elementsLength; i++) {
-        if(elements[i].id) {
-            results[count++] = elements[i].id
+    for (; i < tagsLength; i++) {
+        if(tags[i].id) {
+            results[counter++] = tags[i].id
         }
     }
 
-    return count
+    return results
 }

@@ -126,3 +126,24 @@ function scrollToItem(item) {
 
 scrollToItem(document.getElementById(parentID))
 */
+
+
+/*
+require('chromedriver');
+const { Builder } = require('selenium-webdriver');
+let driver = new Builder().forBrowser('chrome').build();
+
+(async function() {
+    await driver.get('https://nodejs.org');
+
+    //use findElements
+    let links = await driver.findElements({css:'nav > ul > li > a'});
+    for(let link of links) {
+        text = await link.getText();
+        console.log(text);
+    }
+    return driver.quit();
+})()
+*/
+
+
