@@ -9,22 +9,16 @@ findTheme, querySelectorsForTheme, themeText
 
 module.exports = (querySelectors, text) => {
     let theme = document.querySelectorAll(querySelectors),
-        title, i, parentID, mark = false
+        title, i, results = [!1, !1]
 
     finder: for (i = 0; i < theme.length; i++) {
         title = theme[i].querySelector('.title').innerText
         if (title.indexOf(text) !== -1) {
             theme[i].style.color = 'red'
-            console.log(`TEXT: ${title}`)
-            parentID = theme[i].parentNode.id
-            mark = true
+            results[0] = theme[i].parentNode.id
+            results[1] = true
             break finder;
         }
     }
-    // document.getElementById(parentID)
-    //     .scrollIntoView({
-    //         block: "center"
-    //         , behavior: "smooth"
-    //     })
-    return [parentID, mark]
+    return results
 }
