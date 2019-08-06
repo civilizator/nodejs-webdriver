@@ -1,6 +1,6 @@
 const {Builder, By, Key, until, Capabilities, promise} = require('selenium-webdriver')
 
-const {findTheme} = require('./assets')
+const {findTheme, getId} = require('./assets')
 
 
 const data = require('./middlewares')
@@ -112,8 +112,13 @@ driver.get(url).then( async()=> {
     }
 
     let result = await driver.executeScript(findTheme, querySelectorsForTheme, themeText)
+
     console.log(result)
+
     await driver.executeScript(scrollTo, result[0])
+
+
+    console.log(await driver.executeScript(getId, 'li'))
 
 
 })
