@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "selenium-webdriver": "^4.0.0-alpha.4"
+    "chromedriver": "^76.0.0",
+    "selenium-webdriver": "^4.0.0-alpha.4",
+    "webdriver": "^5.11.13"
   }
 }

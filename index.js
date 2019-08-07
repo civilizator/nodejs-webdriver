@@ -1,3 +1,4 @@
+require('chromedriver')
 const {Builder, By, Key, until, Capabilities} = require('selenium-webdriver')
 
 const {getId, checkText, scrollTo, setStyle} = require('./assets')
@@ -13,7 +14,7 @@ let chromeOptions = {
     'args': [
           '--test-type'
         , '--incognito'
-        , '--start-maximized'
+        //, '--start-maximized' //option not worked in new version chromedriver
     ]
 }
 
@@ -25,7 +26,11 @@ let driver = new Builder()
     .withCapabilities(chromeCapabilities)
     .build()
 
+driver.manage().window().maximize()
+
 driver.get(url).then( async()=> {
+
+
 
     let signIn = async (login, password) => {
         await driver.findElement(By.css(`input[name='vb_login_username']`)).sendKeys(login)
@@ -52,32 +57,33 @@ driver.get(url).then( async()=> {
         await driver.wait(until.elementLocated(By.css(`input[name='query']`)), 10000)
             .then( async element => {
                 await driver.executeScript(`arguments[0].scrollIntoView({block: "center", behavior: "smooth"})`, element)
-                await driver.sleep(500)
-                await element.click()
                 await driver.sleep(300)
+                await element.click()
+                await driver.sleep(100)
                 await element.sendKeys('Utest')
             })
 
         await driver.wait(until.elementLocated(By.xpath(`//select[@name='titleonly']`)), 5000)
             .then( async element => {
                 await element.sendKeys(Key.ENTER)
-                await driver.sleep(300)
+                await driver.sleep(100)
                 await element.sendKeys(Key.DOWN)
-                await driver.sleep(300)
+                await driver.sleep(100)
                 await element.sendKeys(Key.ENTER)
             })
 
         await driver.wait(until.elementLocated(By.xpath(`//select[@name='searchdate']`)), 5000)
             .then( async element => {
+                await driver.sleep(300)
                 await driver.executeScript(`arguments[0].scrollIntoView({block: "center", behavior: "smooth"})`, element)
                 await element.sendKeys(Key.ENTER)
-                await driver.sleep(300)
+                await driver.sleep(100)
                 await element.sendKeys(Key.DOWN)
-                await driver.sleep(300)
+                await driver.sleep(100)
                 await element.sendKeys(Key.DOWN)
-                await driver.sleep(300)
+                await driver.sleep(100)
                 await element.sendKeys(Key.DOWN)
-                await driver.sleep(300)
+                await driver.sleep(100)
                 await element.sendKeys(Key.ENTER)
             })
 
