@@ -5,32 +5,29 @@ const {getId, checkText, scrollTo, setStyle} = require('./assets')
 const data = require('./middlewares')
 
 let url =
-    'https://www.govorimpro.us/'
+    //'https://www.govorimpro.us/'
     //,'http://127.0.0.1:8080'
     //,'https://www.govorimpro.us/%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D0%B2-%D1%81%D1%88%D0%B0/36516-utest-2071.html'
-    //'https://www.govorimpro.us/%D0%BD%D0%B0-%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BD%D1%8E-%D0%BA-%D0%B4%D0%B5%D0%B4%D1%83%D1%88%D0%BA%D0%B5-%D0%B4%D0%BB%D1%8F-%D0%BD%D0%B5%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B8%D0%B2%D1%88%D0%B8%D1%85%D1%81%D1%8F-%D0%BA%D1%83%D0%B4%D0%B0-%D0%B5%D1%85%D0%B0%D1%82%D1%8C/52591-%D0%B8%D1%89%D0%B5%D0%BC-%D0%BB%D1%8E%D0%B4%D0%B5%D0%B9-%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D1%8B%D1%85-%D0%BF%D0%BE%D0%BC%D0%BE%D1%87%D1%8C-%D0%B2-%D0%BE%D0%B1%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%82%D0%B2%D0%B5-%D0%B2-%D1%81%D1%88%D0%B0.html'
+    'https://www.govorimpro.us/%D0%BD%D0%B0-%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BD%D1%8E-%D0%BA-%D0%B4%D0%B5%D0%B4%D1%83%D1%88%D0%BA%D0%B5-%D0%B4%D0%BB%D1%8F-%D0%BD%D0%B5%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B8%D0%B2%D1%88%D0%B8%D1%85%D1%81%D1%8F-%D0%BA%D1%83%D0%B4%D0%B0-%D0%B5%D1%85%D0%B0%D1%82%D1%8C/52591-%D0%B8%D1%89%D0%B5%D0%BC-%D0%BB%D1%8E%D0%B4%D0%B5%D0%B9-%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D1%8B%D1%85-%D0%BF%D0%BE%D0%BC%D0%BE%D1%87%D1%8C-%D0%B2-%D0%BE%D0%B1%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%82%D0%B2%D0%B5-%D0%B2-%D1%81%D1%88%D0%B0.html'
 
-let chromeOptions = {
-    'args': [
-          '--test-type'
-        , '--incognito'
-        //, '--start-maximized' //option not worked in new version chromedriver
-    ]
+let capabilities = {
+      'browserName': 'chrome'
+    , 'chromeOptions': {
+        'args': [
+            '--test-type'
+            , '--incognito'
+            //, '--start-maximized' //option not worked in new version chromedriver
+        ]
+    }
 }
 
-let chromeCapabilities = Capabilities
-    .chrome()
-    .set('chromeOptions', chromeOptions)
-
 let driver = new Builder()
-    .withCapabilities(chromeCapabilities)
+    .withCapabilities(capabilities)
     .build()
 
 driver.manage().window().maximize()
 
 driver.get(url).then( async()=> {
-
-
 
     let signIn = async (login, password) => {
         await driver.findElement(By.css(`input[name='vb_login_username']`)).sendKeys(login)
@@ -91,17 +88,23 @@ driver.get(url).then( async()=> {
     }
 
 
-    await signIn(data.login, data.password)
+
+    // await signIn(data.login, data.password)
+    // await advancedSearch()
     // await inbox()
-    await advancedSearch()
+
     // await searchText(s2)
 
-    let allId = await driver.executeScript(getId, 'li')
-        ,searchString = 'Utest'
-        ,foundText = await driver.executeScript(checkText, allId, searchString)
-    await driver.executeScript(scrollTo, foundText[0])
-    await driver.executeScript(setStyle, foundText[0], searchString)
+    // let allId = await driver.executeScript(getId, 'li')
+    //     ,searchString = 'Utest'
+    //     ,foundText = await driver.executeScript(checkText, allId, searchString)
+    // await driver.executeScript(scrollTo, foundText[0])
+    // await driver.executeScript(setStyle, foundText[0], searchString)
 
+    let allIds = await driver.executeScript(getId, 'div')
+    let searchStringPost = 'В какой штат планируете?'
+    let searchPost = await driver.executeScript(checkText, allIds, searchStringPost)
+    console.log(searchPost)
 
     let str = 'В мою контору опять требуется тостер, расширяемся чо'
     let c = 'Здравствуйте! У меня немного глупый, наверное, вопрос, но я никак не могу понять'
@@ -138,5 +141,9 @@ driver.get(url).then( async()=> {
     }
 
 })
+//     .then(() => {
+//     driver.sleep(2000)
+//     driver.quit();
+// })
 
 
