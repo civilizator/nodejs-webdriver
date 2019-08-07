@@ -1,13 +1,13 @@
 module.exports = (ids, text) => {
 
-    let theme = ids,
+    let foundIDs = ids,
         title,
         i = 0,
-        themeLength = theme.length,
+        themeLength = foundIDs.length,
         results = [!1, !1]
 
     finder: for (; i < themeLength; i++) {
-        title = document.getElementById(theme[i])
+        title = document.getElementById(foundIDs[i])
 
         if (title.innerText.indexOf(text) !== -1) {
             results[0] = title.id

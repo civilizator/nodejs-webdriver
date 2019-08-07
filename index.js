@@ -105,6 +105,9 @@ driver.get(url).then( async()=> {
     let searchStringPost = 'В какой штат планируете?'
     let searchPost = await driver.executeScript(checkText, allIds, searchStringPost)
     console.log(searchPost)
+    // await driver.executeScript(scrollTo, searchPost[0])
+    // await driver.executeScript(setStyle, searchPost[0], searchStringPost)
+
 
     let str = 'В мою контору опять требуется тостер, расширяемся чо'
     let c = 'Здравствуйте! У меня немного глупый, наверное, вопрос, но я никак не могу понять'
