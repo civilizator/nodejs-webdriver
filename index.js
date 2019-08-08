@@ -46,7 +46,7 @@ driver.get(url).then( async()=> {
     }
 
 
-    let advancedSearch = async () => {
+    let advancedSearch = async (text) => {
 
         await driver.wait(until.elementLocated(By.xpath(`//a[text()='Расширенный поиск']`)), 10000)
             .then( element => element.click() )
@@ -57,7 +57,7 @@ driver.get(url).then( async()=> {
                 await driver.sleep(300)
                 await element.click()
                 await driver.sleep(100)
-                await element.sendKeys('Utest')
+                await element.sendKeys(text)
             })
 
         await driver.wait(until.elementLocated(By.xpath(`//select[@name='titleonly']`)), 5000)
@@ -85,31 +85,40 @@ driver.get(url).then( async()=> {
             })
 
         await driver.findElement(By.css(`input[name='dosearch']`)).click()
+        return text
     }
 
-    let checkFoundTextTheme = async () => {
-        let allId = await driver.executeScript(getId, 'li')
-            ,searchString = 'Utest'
-            ,foundText = await driver.executeScript(checkText, allId, searchString)
+    let checkFoundTextTheme = async (text) => {
+        let allId = await driver.executeScript(getId, 'li'),
+            searchString = text,
+            foundText = await driver.executeScript(checkText, allId, searchString)
         await driver.executeScript(scrollTo, foundText)
         await driver.executeScript(setColorFound, foundText, searchString)
+
     }
 
     let searchPost = async (text) => {
-        let allIds = await driver.executeScript(getId, 'div')
-        let searchStringPost = text
-        let getPostID = await driver.executeScript(findPost, allIds, searchStringPost)
-        await driver.executeScript(scrollTo, getPostID)
-        await driver.executeScript(setColorForID, getPostID)
+        await driver.wait(until.elementLocated(By.xpath(`//div[text()='${text}']`)), 10000)
+            .then( async () => {
+                let allIds = await driver.executeScript(getId, 'div')
+                let getPostID = await driver.executeScript(findPost, allIds, text)
+                await driver.executeScript(scrollTo, getPostID)
+                await driver.executeScript(setColorForID, getPostID)
+            } )
     }
 
 
-    // await signIn(data.login, data.password)
+    await signIn(data.login, data.password)
 
+    let theme = 'Utest'
+    await advancedSearch(theme)
+        .then(async (returnText)=>{
+            await checkFoundTextTheme(returnText)
+            return returnText
+        }).then(async (returnText) => {await driver.findElement(By.xpath(`//a[text()='${returnText}']`)).click()})
 
-    // await advancedSearch()
     // await inbox()
-    // await checkFoundTextTheme()
+    // await checkFoundTextTheme('Utest')
     // await searchPost('В какой штат планируете?')
 
 })
