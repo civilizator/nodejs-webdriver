@@ -1,14 +1,11 @@
 require('chromedriver')
 const {Builder, By, Key, until, Capabilities} = require('selenium-webdriver')
 
-const {getId, checkText, findPost, scrollTo, setColorFound, setColorForID} = require('./assets')
+const {getId, checkText, findPost, scrollTo, setColorFound, setColorForID, searchInSearch, searchUserByText} = require('./assets')
 const data = require('./middlewares')
 
 let url =
-    //'https://www.govorimpro.us/'
-    //,'http://127.0.0.1:8080'
-    //,'https://www.govorimpro.us/%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D0%B2-%D1%81%D1%88%D0%B0/36516-utest-2071.html'
-    'https://www.govorimpro.us/%D0%BD%D0%B0-%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BD%D1%8E-%D0%BA-%D0%B4%D0%B5%D0%B4%D1%83%D1%88%D0%BA%D0%B5-%D0%B4%D0%BB%D1%8F-%D0%BD%D0%B5%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B8%D0%B2%D1%88%D0%B8%D1%85%D1%81%D1%8F-%D0%BA%D1%83%D0%B4%D0%B0-%D0%B5%D1%85%D0%B0%D1%82%D1%8C/52591-%D0%B8%D1%89%D0%B5%D0%BC-%D0%BB%D1%8E%D0%B4%D0%B5%D0%B9-%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D1%8B%D1%85-%D0%BF%D0%BE%D0%BC%D0%BE%D1%87%D1%8C-%D0%B2-%D0%BE%D0%B1%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%82%D0%B2%D0%B5-%D0%B2-%D1%81%D1%88%D0%B0.html'
+    'https://www.govorimpro.us/'
 
 let capabilities = {
       'browserName': 'chrome'
@@ -16,7 +13,6 @@ let capabilities = {
         'args': [
             '--test-type'
             , '--incognito'
-            //, '--start-maximized' //option not worked in new version chromedriver
         ]
     }
 }
@@ -44,7 +40,6 @@ driver.get(url).then( async()=> {
             })
         await driver.findElement(By.xpath(`//a[text()='Входящие']`)).click()
     }
-
 
     let advancedSearch = async (text) => {
 
@@ -98,33 +93,96 @@ driver.get(url).then( async()=> {
     }
 
     let searchPost = async (text) => {
-        await driver.wait(until.elementLocated(By.xpath(`//div[text()='${text}']`)), 10000)
+        let getPostID
+        // await driver.wait(until.elementLocated(By.xpath(`//div[text()='${text}']`)), 10000)
+        await driver.wait(until.elementLocated(By.className('postcontent restore')), 10000)
             .then( async () => {
                 let allIds = await driver.executeScript(getId, 'div')
-                let getPostID = await driver.executeScript(findPost, allIds, text)
+                getPostID = await driver.executeScript(findPost, allIds, text)
                 await driver.executeScript(scrollTo, getPostID)
                 await driver.executeScript(setColorForID, getPostID)
             } )
+        return getPostID
     }
 
+    let searchInTheme = async (text) => {
+        await driver.wait(until.elementLocated(By.xpath(`//a[text()='Поиск по теме']`)), 10000).click()
+        await driver.findElement(By.css(`input[name='query']`)).sendKeys(text)
+        await driver.findElement(By.css(`input[value='Поиск']`)).click()
+        return text
+    }
 
+    let clickAnchor = async (textAnchor, timeWait) => {
+        await driver.wait(until.elementLocated(By.xpath(`//a[text()='${textAnchor}']`)), timeWait).click()
+    }
+
+    let sendPrivateMessage = async (title, message) => {
+
+        await driver.wait(until.elementLocated(By.xpath(`//a[contains(text(), 'Отправить личное сообщение')]`)), 10000).click()
+        await driver.findElement(By.css(`input[name='title']`)).sendKeys(title)
+        await driver.findElement(By.css(`textarea[role='textbox']`)).sendKeys(message)
+        await driver.findElement(By.css(`input[name='preview']`))
+            .then(async (element) => {
+                await driver.executeScript(`arguments[0].scrollIntoView({behavior: 'smooth'})`, element)
+                await driver.sleep(500)
+                await element.click()
+            })
+        await driver.sleep(2000)
+        await driver.findElement(By.css(`input[name='sbutton']`))
+            .then(async (element) => {
+                await driver.executeScript(`arguments[0].scrollIntoView({behavior: 'smooth'})`, element)
+                await driver.sleep(1000)
+                await element.click()
+            })
+    }
+
+    //todo Sign In to Account
     await signIn(data.login, data.password)
 
+   //todo Use Advanced Search
     let theme = 'Utest'
     await advancedSearch(theme)
         .then(async (returnText)=>{
             await checkFoundTextTheme(returnText)
             return returnText
-        }).then(async (returnText) => {await driver.findElement(By.xpath(`//a[text()='${returnText}']`)).click()})
+        }).then(async (returnText) => {await clickAnchor(returnText, 5000)})
 
+    // await clickAnchor('Последняя')
+
+    //todo Search Text in Theme
+    let searchTextInTheme = 'В мою контору опять требуется тостер, расширяемся чо'
+    let searchTextTheme = await searchInTheme(searchTextInTheme)
+
+
+    //todo Search in Found
+    let searchInFound = await driver.executeScript(searchInSearch, searchTextInTheme)
+    await driver.wait(until.elementLocated(By.css(`[href^="${searchInFound}"]`)), 2000).click()
+
+    //todo Go to Inbox
     // await inbox()
-    // await checkFoundTextTheme('Utest')
-    // await searchPost('В какой штат планируете?')
 
+    //todo Search Post in Theme
+    let getPost = await searchPost(searchTextInTheme)
+
+    //todo Go to User Profile
+    let searchUser = await driver.executeScript(searchUserByText, searchTextTheme)
+    let urlUs = await driver.wait(until.elementLocated(By.css(`[href^="${searchUser}"]`)), 2000).click()
+    await driver.get(searchUser)
+
+    //todo Send Private Message and Fill Fields Message
+
+    let title = 'This Test. Do something or write',
+        message = 'Привет Aleks! \n' +
+            'Я приложил видео :) \n' +
+            '[URL="http://drive.google.com/open?id=1RpfOVSjZhuMdygktn82ESGAt0l0OT8W1"]http://drive.google.com/open?id=1RpfOVSjZhuMdygktn82ESGAt0l0OT8W1[/URL]'
+
+
+    await sendPrivateMessage(title, message)
+
+    console.log("Bye Aleks )))))))))))")
+}).then(() => {
+    driver.sleep(2000)
+    driver.quit();
 })
-//     .then(() => {
-//     driver.sleep(2000)
-//     driver.quit();
-// })
 
 
