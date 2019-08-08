@@ -1,7 +1,7 @@
 require('chromedriver')
 const {Builder, By, Key, until, Capabilities} = require('selenium-webdriver')
 
-const {getId, checkText, scrollTo, setStyle} = require('./assets')
+const {getId, checkText, findPost, scrollTo, setColorFound, setColorForID} = require('./assets')
 const data = require('./middlewares')
 
 let url =
@@ -87,61 +87,30 @@ driver.get(url).then( async()=> {
         await driver.findElement(By.css(`input[name='dosearch']`)).click()
     }
 
+    let checkFoundTextTheme = async () => {
+        let allId = await driver.executeScript(getId, 'li')
+            ,searchString = 'Utest'
+            ,foundText = await driver.executeScript(checkText, allId, searchString)
+        await driver.executeScript(scrollTo, foundText)
+        await driver.executeScript(setColorFound, foundText, searchString)
+    }
+
+    let searchPost = async (text) => {
+        let allIds = await driver.executeScript(getId, 'div')
+        let searchStringPost = text
+        let getPostID = await driver.executeScript(findPost, allIds, searchStringPost)
+        await driver.executeScript(scrollTo, getPostID)
+        await driver.executeScript(setColorForID, getPostID)
+    }
 
 
     // await signIn(data.login, data.password)
+
+
     // await advancedSearch()
     // await inbox()
-
-    // await searchText(s2)
-
-    // let allId = await driver.executeScript(getId, 'li')
-    //     ,searchString = 'Utest'
-    //     ,foundText = await driver.executeScript(checkText, allId, searchString)
-    // await driver.executeScript(scrollTo, foundText[0])
-    // await driver.executeScript(setStyle, foundText[0], searchString)
-
-    let allIds = await driver.executeScript(getId, 'div')
-    let searchStringPost = 'В какой штат планируете?'
-    let searchPost = await driver.executeScript(checkText, allIds, searchStringPost)
-    console.log(searchPost)
-    // await driver.executeScript(scrollTo, searchPost[0])
-    // await driver.executeScript(setStyle, searchPost[0], searchStringPost)
-
-
-    let str = 'В мою контору опять требуется тостер, расширяемся чо'
-    let c = 'Здравствуйте! У меня немного глупый, наверное, вопрос, но я никак не могу понять'
-    let s2 = "У меня немного глупый,"
-
-    let searchText = (word) => {
-
-        let searchEl = (text) => {
-            let posts = document.querySelectorAll('.postcontent.restore'),
-                post, i, parentID
-
-            finder: for (i = 0; i < posts.length; i++) {
-                post = posts[i].innerText
-                if (post.indexOf(text) !== -1) {
-                    posts[i].style.color = 'red'
-                    posts[i].style.transition = "1s 1.2s"
-                    console.log(`TEXT: ${post}`)
-                    parentID = posts[i].parentNode.id
-                    break finder;
-                }
-            }
-
-            document.getElementById(parentID)
-                .scrollIntoView({
-                    block: "center"
-                    , behavior: "smooth"
-                })
-            return [post, parentID]
-        }
-
-        driver.executeScript(searchEl, word).then(returnValue => {
-            console.log(`Return Value by myfunction -> ${returnValue}`)
-        })
-    }
+    // await checkFoundTextTheme()
+    // await searchPost('В какой штат планируете?')
 
 })
 //     .then(() => {
