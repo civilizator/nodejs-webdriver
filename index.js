@@ -4,7 +4,7 @@ const {Builder, By, Key, until, Capabilities} = require('selenium-webdriver')
 const {getId, checkText, findPost, scrollTo, setColorFound, setColorForID, searchInSearch, searchUserByText} = require('./assets')
 const data = require('./middlewares')
 
-let url = 'https://www.govorimpro.us/'
+let url = 'url'
 
 let capabilities = {
       'browserName': 'chrome'
